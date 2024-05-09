@@ -1,0 +1,14 @@
+experiment_dir: 'experiment'
+origin_metric_dir: 'origin_data/metric'
+origin_log_dir: 'origin_data/log'
+origin_trace_dir: 'origin_data/trace'
+origin_groundtruth_dir: 'origin_data/groundtruth'
+
+ignore_list: ''
+
+# mysql
+host: 172.17.0.2
+user: root
+password: elastic
+port: 3306
+database: platform_work
