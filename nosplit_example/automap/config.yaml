@@ -1,0 +1,23 @@
+run_table_path: 'run_table.csv'
+
+metric_dir: 'metric'
+
+processed_data_dir: 'processed'
+
+types: 'container_cpu_user_seconds_total container_cpu_usage_seconds_total  container_memory_rss container_memory_usage_bytes'
+  
+instances: 'cartservice-0 cartservice-1 cartservice-2  checkoutservice-0 checkoutservice-1 checkoutservice-2 currencyservice-0 currencyservice-1 currencyservice-2 emailservice-0 emailservice-1 emailservice-2 frontend-0 frontend-1 frontend-2  paymentservice-0 paymentservice-1 paymentservice-2 productcatalogservice-0 productcatalogservice-1 productcatalogservice-2 recommendationservice-0 recommendationservice-1 recommendationservice-2 shippingservice-0 shippingservice-1 shippingservice-2 '
+  
+sequence_num: 10
+
+E_W_C_dir: 'test_time_E_W_C'
+
+epoch: 10
+
+node_to_drop: 'productcatalogservice-0 checkoutservice-1 frontend-1 emailservice-0'
+
+num_loop: 500
+
+result_path: 'result.json'
+
+image_dir: 'image'

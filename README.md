@@ -18,13 +18,13 @@ git clone https://github.com/MicroServo/hot-plugging.git
 After cloning the repository, place your own algorithm in the algorithm folder.
 
 ### Reformat your algorithm code
-Before you start implementing the training and testing methods for your algorithm, you need to make some modifications to your code to meet our requirements. Initially, all file path information must be integrated into a configuration file at the algorithm directory, using absolute paths. Adherence to naming conventions is mandatory; directories should end with 'dir' and files with 'path'. Subsequently, users must prepare a requirements.txt file detailing all necessary dependencies for the algorithm’s execution.
+Before you start implementing the training and testing methods for your algorithm, you need to make some modifications to your code to meet our requirements. Initially, all file path information must be integrated into a configuration file at the algorithm directory, using absolute paths. Adherence to naming conventions is mandatory; directories should end with 'dir' and files with 'path'. Subsequently, users must prepare a requirements.txt file detailing all necessary dependencies for the algorithm’s execution. 
 
 
 ### Extending the `Algorithm` Class
 After you have adjusted the format, you can start to extend the `Algorithm` Class. This class is located in `algorithmTemplate/algorithm_app/algorithm.py`. If you simply want to view the effects of the model without saving it, you only need to implement the `__init__` and `run` methods. 
 
-If you want to deploy the algorithm online to the platform, you will need to implement the __init__, train, and test methods. Additionally, you will need to include the paths of the models to be saved and the paths of intermediate results in the ignore_list within config.yaml located in the root directory.
+If you want to deploy the algorithm online to the platform, you will need to implement the __init__, train, and test methods. If there are intermediate results that need to be saved, the corresponding fields in the configuration file should be placed in the 'ignore_list' in 'algorithm_app/public_function.py'.
 
 Before starting, we need to import our own algorithm methods into algorithm.py. We recommend that you encapsulate your algorithm into a class similar to our `Algorithm` class.
 
@@ -41,78 +41,31 @@ The `test` method is used to test the model. MicroServo will read the model trai
 The `run` method does not differentiate between training and testing. MicroServo provides the original data (with labels). In this method, you need to implement data preprocessing, model training, model testing, and then return **Json data** in a specific format. Finally, MicroServo will store the data in the database.
 
 ## Example
-Here's an example of how to create a custom algorithm using MicroServo SDK:
+We have provided two example files, one with split train-test `split_example` and one without split train-test `nosplit_example`, hoping to be of some help to you.
 
-```Python
-import os
-import pathlib
-import sys
-root_path = pathlib.Path(__file__).parent.parent
-sys.path.append(str(root_path))
-from automap.automap import AutoMap
-from algorithm_app.public_function import get_config, deal_config
-import shutil
-
-sys_config_file = 'config.yaml'
-sys_config = get_config(sys_config_file)
-base_dir = os.path.join(os.path.dirname(__file__), sys_config['experiment_dir'])
-
-config_file = 'automap/config.yaml'
-class Algorithm:
-    def __init__(self, user):
-        config = get_config(config_file)
-        config = deal_config(config, user, base_dir)
-        self.model = AutoMap(config)
-        self.experiment_dir = os.path.join(base_dir, user)
-        self.origin_metric_dir = os.path.join(base_dir, user, sys_config['origin_metric_dir'])
-        self.origin_groundtruth_dir = os.path.join(base_dir, user, sys_config['origin_groundtruth_dir'])
-
-    def train(self):
-        pass
-
-    def test(self):
-        pass
-
-    def run(self):
-        try:
-            """
-            result_dict = {
-                'top@k': {
-                    0: {'top1': 0.1, 'top2': 0.1, 'top3': 0.1, 'top4': 0.1, 'top5': 0.1},
-                    1: {'top1': 0.1, 'top2': 0.1, 'top3': 0.1, 'top4': 0.1, 'top5': 0.1},
-                    2: {'top1': 0.1, 'top2': 0.1, 'top3': 0.1, 'top4': 0.1, 'top5': 0.1}
-                },
-                'epoch': 3
-            }
-            """
-            
-            result_dict = self.model.run(self.origin_metric_dir, self.origin_groundtruth_dir)
-            return result_dict
-        except Exception as e:
-            print(e)
-        finally:
-            self.clear()
-    
-    def clear(self):
-        if os.path.exists(self.experiment_dir):
-            shutil.rmtree(self.experiment_dir)
-```
 Feel free to adapt this example to your specific needs and customize your algorithms for MicroServo platform. 🎉🎉
 
-## Debug
+## Test your algorithm
 After you have completed all operations, don't rush to upload; you can first test it locally. 😎
 
-### Implement the `test` API Interface
-MicroServo has reserved a `test` interface in `algorithmTemplate/algorithm_app/views.py`, which is used to test for potential issues such as path problems in each method. In this method, you need to call the method of the `Algorithm` class that you want to test, such as `train`, `test`.
+1. First, build docker image. Run the following command:
 
-### Copy the data to experiment
-We simulate the process of the platform sending data by copying data. You need to place the sample data you use in `algorithmTemplate/algorithm_app/experiment/YOUR_USERNAME/origin_data`, where YOUR_USERNAME is any name you choose.
+    docker build -t YOUR_IMAGE_NAME .
 
-### Docker compose
-- First, you need to install Docker Compose.
-- Once you complete installation, execute the following command under `algorithmTemplate/`:
-    ```bash
-    docker compose build
-    docker compose up -d
-    ```
-- After the container is successfully running, execute the command `curl http://localhost:18010/test?user=YOUR_USERNAME` to call the `test` interface, and you can observe the algorithm's operation.
+2. Second, run algorithm container.
+   
+   docker run --name 'YOUR_CONTAINER_NAME' -v $(pwd):/code YOUR_IMAGE_NAME python manage.py runserver 0.0.0.0:8000
+
+3. Third, inspect container's ip
+
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' YOUR_CONTAINER_NAME
+
+4. Fourth, implement the interface of algorithm_app/views.py:test. Such as algorithm.train() and algorithm.test().
+
+5. Fifth, copy the demo dataset to algorithm_app/experiment.
+
+    Create a USER folder under algorithm_app/experiment, and place the demo dataset in USER/origin_data
+
+6. Sixth, send the curl request.
+
+    curl "http:/CONTAINER_IP:8000/test?user=USER"
