@@ -1,8 +1,8 @@
-# MicroServo SDK User Guide
+# AIOpsArena SDK User Guide
 
 ## Introduction
 
-👏 Welcome to the MicroServo SDK, a platform's Algorithm Hot-plugging feature designed for deployment model. This platform is dedicated to model deployment services. With its help, users can easily train models and test it. During operation, the platform automatically creates a Docker container to run the algorithm. If you choose to deploy the algorithm online, you can use the `train` method to train your model and then use the `test` method to test it. Alternatively, if you just want to observe the effects of the model, you can choose to use the `run` method to train, test, and obtain results in one go. The path to the original data is written in the system configuration file, which can be directly used in the model methods.
+👏 Welcome to the AIOpsArena SDK, a platform's Algorithm Hot-plugging feature designed for deployment model. This platform is dedicated to model deployment services. With its help, users can easily train models and test it. During operation, the platform automatically creates a Docker container to run the algorithm. If you choose to deploy the algorithm online, you can use the `train` method to train your model and then use the `test` method to test it. Alternatively, if you just want to observe the effects of the model, you can choose to use the `run` method to train, test, and obtain results in one go. The path to the original data is written in the system configuration file, which can be directly used in the model methods.
 
 
 ## Getting Started
@@ -11,7 +11,7 @@
 First, clone our repository by running the following command:
 
 ```bash
-git clone https://github.com/MicroServo/hot-plugging.git
+git clone https://github.com/AIOpsArena/hot-plugging.git
 ```
 
 ### Adding your algorithm code
@@ -32,18 +32,18 @@ Before starting, we need to import our own algorithm methods into algorithm.py. 
 The `__init__` method is responsible for handling the path information of the algorithm, initializing your model, and providing some variables for the original data. After processing by the `__init__` method, all paths will be modified to start with the `algorithmTemplate/algorithm_app/experiment` prefix, facilitating subsequent management.
 
 ### Implementing the `train` Method
-The `train` method is used to train your model. MicroServo will provide the original data (with labels) mentioned in the `__init__` method. Here, you need to implement your data preprocessing logic, then use the preprocessed data to train the model, and save the model in the experiment path after training is complete.
+The `train` method is used to train your model. AIOpsArena will provide the original data (with labels) mentioned in the `__init__` method. Here, you need to implement your data preprocessing logic, then use the preprocessed data to train the model, and save the model in the experiment path after training is complete.
 
 ### Implementing the `test` Method
-The `test` method is used to test the model. MicroServo will read the model trained by the `train` method and the test data (with labels). In this method, you need to return **Json data** in a specific format. MicroServo will store the data in the database and display it on the platform's evaluation data page.
+The `test` method is used to test the model. AIOpsArena will read the model trained by the `train` method and the test data (with labels). In this method, you need to return **Json data** in a specific format. AIOpsArena will store the data in the database and display it on the platform's evaluation data page.
 
 ### Implementing the `run` Method
-The `run` method does not differentiate between training and testing. MicroServo provides the original data (with labels). In this method, you need to implement data preprocessing, model training, model testing, and then return **Json data** in a specific format. Finally, MicroServo will store the data in the database.
+The `run` method does not differentiate between training and testing. AIOpsArena provides the original data (with labels). In this method, you need to implement data preprocessing, model training, model testing, and then return **Json data** in a specific format. Finally, AIOpsArena will store the data in the database.
 
 ## Example
 We have provided two example files, one with split train-test `split_example` and one without split train-test `nosplit_example`, hoping to be of some help to you.
 
-Feel free to adapt this example to your specific needs and customize your algorithms for MicroServo platform. 🎉🎉
+Feel free to adapt this example to your specific needs and customize your algorithms for AIOpsArena platform. 🎉🎉
 
 ## Test your algorithm
 After you have completed all operations, don't rush to upload; you can first test it locally. 😎
